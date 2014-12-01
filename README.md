@@ -11,7 +11,7 @@ Output keys must be specified. If none are specified, all the top-level keys of
 the first object are taken as the template.
 
 
-  jsontsv 'title rating url' < input.json
+    jsontsv 'title rating url' < input.json
 
 
 Terminal values. If the key maps to a scalar value or Null, it is printed to
@@ -23,7 +23,7 @@ are mapped to the objects that assumed to populate the array.
 
 ## Nested keys
 
-  jsontsv 'title duplicates.Rental.HD duplicates.Rental.SD' < input.json
+    jsontsv 'title duplicates.Rental.HD duplicates.Rental.SD' < input.json
 
 
 ## Column names
@@ -32,13 +32,13 @@ Column names are simply the keypaths
 
 ## Using a file to designate columns:
 
-  jsontsv -f keys  < input.json
+    jsontsv -f keys  < input.json
 
 ## Indicating presence
 
 Appending a question mark, e.g.
 
-  .title? 
+    title? 
 
 will output T if present, F is not present
 
