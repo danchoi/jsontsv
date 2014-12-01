@@ -1,0 +1,37 @@
+http://hackage.haskell.org/package/aeson-0.8.0.1
+
+decode = decodeWith jsonEOF fromJSON
+
+decode :: (FromJSON a) => L.ByteString -> Maybe a
+decode = decodeWith jsonEOF fromJSON
+
+http://hackage.haskell.org/package/aeson-0.8.0.1/docs/src/Data-Aeson.html#decode
+
+import Data.Aeson.Parser.Internal (decodeWith, decodeStrictWith,
+                                   eitherDecodeWith, eitherDecodeStrictWith,
+                                   jsonEOF, json, jsonEOF', json')
+
+
+import qualified Data.Attoparsec.Lazy as L
+
+http://hackage.haskell.org/package/aeson-0.6.0.0/docs/src/Data-Aeson-Parser-Internal.html
+
+
+decodeWith :: Parser Value -> (Value -> Result a) -> L.ByteString -> Maybe a
+decodeWith p to s =
+    case L.parse p s of
+      L.Done _ v -> case to v of
+                      Success a -> Just a
+                      _         -> Nothing
+
+import qualified Data.Attoparsec.Lazy as L
+
+https://hackage.haskell.org/package/attoparsec-0.12.1.2
+
+import Data.Attoparsec.ByteString.Lazy
+
+https://hackage.haskell.org/package/attoparsec-0.12.1.2/docs/Data-Attoparsec-ByteString-Lazy.html
+
+jsonEOF :: Parser Value
+jsonEOF = json <* skipSpace <* endOfInput
+
