@@ -11,7 +11,7 @@ Output keys must be specified. If none are specified, all the top-level keys of
 the first object are taken as the template.
 
 
-  jsontsv '.title .rating .url' < input.json
+  jsontsv 'title rating url' < input.json
 
 
 Terminal values. If the key maps to a scalar value or Null, it is printed to
