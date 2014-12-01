@@ -1,5 +1,7 @@
 # jsontsv
 
+NOT IN WORKING STATE; IN PROGRESS.
+
 A simple tool to transform JSON into tab-separated line-oriented output
 amenable to Unix text processing. 
 
