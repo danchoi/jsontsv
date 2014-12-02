@@ -32,6 +32,9 @@ input.json:
 }
 ```
 
+Note that this input is not actually JSON at the top-level. It is a stream of
+JSON objects. It can be fed into `jsontsv`:
+
     jsontsv 'title year stars ratings.imdb' < input.json
 
 outputs this tab-separated text:
