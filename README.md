@@ -41,6 +41,15 @@ Terminator 2: Judgement Day	1991	Arnold Schwarzenegger,Linda Hamilton	8.5
 Interstellar	2014	Matthew McConaughey,Anne Hathaway	8.9
 ```
 
+You can pick off array elements using `[i]` syntax:
+
+    jsontsv 'title year stars[0]' < input.json
+
+```tsv
+Terminator 2: Judgement Day     1991    Arnold Schwarzenegger
+Interstellar    2014    Matthew McConaughey
+```
+
 ## Installation
 
 Assuming you have a recent version of the [Haskell
@@ -79,7 +88,7 @@ JSON leaf values are printed as follows:
 * Strings and numbers are copied to output.
 * Boolean values are output as `t` or `f`.
 * null is printed as `null`
-* Arrays of leaf values are concatenated into a single comma-separated string
+* If the leaf value is an array, it concatenated into a single comma-separated string
 
 ## Performing post-processing on field values
 
