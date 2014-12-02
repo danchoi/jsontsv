@@ -24,6 +24,8 @@ executable jsontsv
                      , bytestring
                      , attoparsec
                      , containers
+                     , unordered-containers
                      , text
+                     , scientific
   -- hs-source-dirs:      
   default-language:    Haskell2010
