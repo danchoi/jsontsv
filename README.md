@@ -119,3 +119,4 @@ Use awk!
 
 * [jsawk](https://github.com/micha/jsawk) 
 * [jq][jq]
+* [jsoncsv](https://github.com/gradus/jsoncsv)
