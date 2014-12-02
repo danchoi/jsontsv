@@ -29,7 +29,7 @@ main = do
         xs = decodeStream x
     (ks:_) <- getArgs 
     let ks' = parseKeyPath $ T.pack ks
-    Prelude.putStrLn $ "key Paths " ++ show ks'
+    -- Prelude.putStrLn $ "key Paths " ++ show ks'
     mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder ks') xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
