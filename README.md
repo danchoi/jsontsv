@@ -2,7 +2,8 @@
 
 Transforms JSON objects into tab-separated line-oriented output, which is more
 convenient for downstream processing with Unix tools like `grep`, `awk`,
-`diff`, etc., and for inspecting with spreadsheet programs. 
+`diff`, etc., and for inspecting with spreadsheet programs using a CSV output
+option.
 
 ## Synopsis
 
