@@ -79,15 +79,7 @@ JSON leaf values are printed as follows:
 * null is printed as `null`
 * Arrays of leaf values are concatenated into a single comma-separated string
 
-## Nested keys
+## Performing post-processing on field values
 
-    jsontsv 'title duplicates.Rental.HD duplicates.Rental.SD' < input.json
-
-## Using a file to designate columns:
-
-    jsontsv -f keys  < input.json
-
-## Concatenating fields, truncating fields, etc.
-
-This should be done downstream using a tool like AWK.
+Use awk!
 
