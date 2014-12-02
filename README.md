@@ -61,6 +61,7 @@ Interstellar    2014    Matthew McConaughey
 Assuming you have a recent version of the [Haskell
 platform](https://www.haskell.org/platform/) on your system, 
 
+    cabal update
     cabal install jsontsv
 
 Make sure the installed executable is on your PATH.
