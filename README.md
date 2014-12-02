@@ -41,11 +41,11 @@ Terminator 2: Judgement Day	1991	Arnold Schwarzenegger,Linda Hamilton	8.5
 Interstellar	2014	Matthew McConaughey,Anne Hathaway	8.9
 ```
 
-## Setup
+## Installation
 
-From the project directory, 
+Assuming you have a recent version of the Haskell platform on your system, 
 
-    cabal install
+    cabal install jsontsv
 
 Make sure the installed executable is on your PATH.
 
