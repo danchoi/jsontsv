@@ -69,8 +69,8 @@ Make sure the installed executable is on your PATH.
 
 Input should be a stream of JSON objects of the same or mostly similar shape,
 separated by whitespace such as newlines. If the objects are wrapped in a JSON
-array at the top level or more deeply nested, use the [jq][jq] tool by Stephan
-Dolan to unwrap or extract the objects, e.g.: 
+array at the top level or nested inside a top-level object, use the [jq][jq]
+tool by Stephan Dolan to extract an object stream, e.g.: 
 
 [jq]:http://stedolan.github.io/jq/
 
