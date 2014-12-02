@@ -92,9 +92,9 @@ evalKeyPath _ _ = Null
 
 valToText :: Value -> Text
 valToText (String x) = x
-valToText Null = ""
-valToText (Bool True) = "true"
-valToText (Bool False) = "false"
+valToText Null = "NULL"
+valToText (Bool True) = "T"
+valToText (Bool False) = "F"
 valToText (Number x) = 
     case floatingOrInteger x of
         Left float -> T.pack . show $ float
