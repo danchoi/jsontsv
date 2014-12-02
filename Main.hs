@@ -8,20 +8,25 @@ import qualified Data.Text.Encoding as T (decodeUtf8)
 import Data.List (intersperse)
 import qualified Data.Text as T
 import Data.Maybe (catMaybes)
+import Control.Applicative
 import Data.ByteString.Lazy as BL hiding (map, intersperse)
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Attoparsec.Lazy as Atto hiding (Result)
 import Data.Attoparsec.ByteString.Char8 (endOfLine, sepBy)
+import qualified Data.Attoparsec.Text as AT
 import qualified Data.HashMap.Lazy as HM
 import qualified Data.Vector as V
 import Data.Scientific 
+import System.Environment (getArgs)
 
 main = do
     x <- BL.getContents 
     let xs :: [Value]
         xs = decodeStream x
-    let ks = [["title"],["rating"],["genres"]]
-    mapM_ (print . evalToList ks) xs
+    (ks:_) <- getArgs 
+    let ks' = parseKeyPath $ T.pack ks
+    Prelude.putStrLn $ "key Paths " ++ show ks'
+    mapM_ (print . evalToList ks') xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
 decodeStream = decodeWith (json `sepBy` endOfLine) fromJSON
@@ -33,6 +38,19 @@ decodeWith p to s =
   where f v = (\x -> case x of 
                       Success a -> Just a 
                       _ -> Nothing) $ to v
+
+parseKeyPath :: Text -> [[Text]]
+parseKeyPath s = case AT.parseOnly pKeyPaths s of
+    Left err -> error $ "Parse error " ++ err 
+    Right res -> res
+
+spaces = many1 AT.space
+
+pKeyPaths :: AT.Parser [[Text]]
+pKeyPaths = pKeyPath `AT.sepBy` spaces
+
+pKeyPath :: AT.Parser [Text]
+pKeyPath = (AT.takeWhile1 (AT.notInClass " .")) `AT.sepBy` (AT.char '.')
 
 type KeyPath = [Text]
 
@@ -57,6 +75,7 @@ evalKeyPath (key:ks) (Object s) =
               xs = intersperse "," $ map (evalToText ks) vs
           in String . mconcat $ xs
         Just x          -> evalKeyPath ks x
+        Nothing -> Null
 evalKeyPath _ _ = Null
 
 valToText :: Value -> Text
