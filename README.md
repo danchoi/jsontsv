@@ -74,7 +74,7 @@ outputs
 
 JSON leaf values are printed as follows: 
 
-* Strings and numbers were copied to output.
+* Strings and numbers are copied to output.
 * Boolean values are output as `t` or `f`.
 * null is printed as `null`
 * Arrays of leaf values are concatenated into a single comma-separated string
