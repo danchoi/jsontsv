@@ -4,6 +4,7 @@ import Data.Aeson
 import Data.Monoid
 import qualified Data.Map.Strict as M
 import Data.Text (Text)
+import qualified Data.Text.Encoding as T (decodeUtf8)
 import Data.List (intersperse)
 import qualified Data.Text as T
 import Data.Maybe (catMaybes)
@@ -35,11 +36,11 @@ decodeWith p to s =
 
 type KeyPath = [Text]
 
-evalToList :: [KeyPath] -> Value -> [String]
-evalToList ks v = map (flip evalToString v) ks
+evalToList :: [KeyPath] -> Value -> [Text]
+evalToList ks v = map (flip evalToText v) ks
 
-evalToString :: KeyPath -> Value -> String
-evalToString k v = valToString $ evalKeyPath k v
+evalToText :: KeyPath -> Value -> Text
+evalToText k v = valToString $ evalKeyPath k v
 
 -- evaluates the a JS key path against a Value context to a leaf Value
 evalKeyPath :: KeyPath -> Value -> Value
@@ -53,21 +54,19 @@ evalKeyPath (key:ks) (Object s) =
     case (HM.lookup key s) of
         Just (Array v) -> 
           let vs = V.toList v
-              xs = intersperse "," $ map (T.pack . evalToString ks) vs
+              xs = intersperse "," $ map (evalToText ks) vs
           in String . mconcat $ xs
         Just x          -> evalKeyPath ks x
 evalKeyPath _ _ = Null
 
-valToString :: Value -> String
-valToString (String x) = T.unpack x
+valToString :: Value -> Text
+valToString (String x) = x
 valToString Null = ""
 valToString (Bool True) = "true"
 valToString (Bool False) = "false"
 valToString (Number x) = 
     case floatingOrInteger x of
-        Left float -> show float
-        Right int -> show int
-valToString x = debugJSON x
-
-debugJSON = B.unpack . encode 
+        Left float -> T.pack . show $ float
+        Right int -> T.pack . show $ int
+valToString (Object _) = "[Object]"
 
