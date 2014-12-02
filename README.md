@@ -43,7 +43,8 @@ Interstellar	2014	Matthew McConaughey,Anne Hathaway	8.9
 
 ## Installation
 
-Assuming you have a recent version of the Haskell platform on your system, 
+Assuming you have a recent version of the [Haskell
+platform](https://www.haskell.org/platform/) on your system, 
 
     cabal install jsontsv
 
