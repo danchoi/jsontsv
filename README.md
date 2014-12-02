@@ -83,3 +83,6 @@ JSON leaf values are printed as follows:
 
 Use awk!
 
+## Known alternatives 
+
+* [jsonawk](https://github.com/micha/jsawk) 
