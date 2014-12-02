@@ -7,10 +7,11 @@ import Data.Text (Text)
 import qualified Data.Text.Encoding as T (decodeUtf8)
 import Data.List (intersperse)
 import qualified Data.Text as T
+import qualified Data.Text.Lazy.IO as TL
 import Data.Maybe (catMaybes)
 import Control.Applicative
 import Data.ByteString.Lazy as BL hiding (map, intersperse)
-import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as BS
 import Data.Attoparsec.Lazy as Atto hiding (Result)
 import Data.Attoparsec.ByteString.Char8 (endOfLine, sepBy)
 import qualified Data.Attoparsec.Text as AT
@@ -18,6 +19,9 @@ import qualified Data.HashMap.Lazy as HM
 import qualified Data.Vector as V
 import Data.Scientific 
 import System.Environment (getArgs)
+import qualified Data.Text.Lazy.Builder as B
+import qualified Data.Text.Lazy.Builder.Int as B
+import qualified Data.Text.Lazy.Builder.RealFloat as B
 
 main = do
     x <- BL.getContents 
@@ -26,7 +30,7 @@ main = do
     (ks:_) <- getArgs 
     let ks' = parseKeyPath $ T.pack ks
     Prelude.putStrLn $ "key Paths " ++ show ks'
-    mapM_ (print . evalToList ks') xs
+    mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder ks') xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
 decodeStream bs = case decodeWith json bs of
@@ -65,8 +69,14 @@ pIndex = Index <$> AT.decimal <* AT.char ']'
 type KeyPath = [Key]
 data Key = Key Text | Index Int deriving (Eq, Show)
 
+evalToLineBuilder :: [KeyPath] -> Value -> B.Builder 
+evalToLineBuilder ks v = mconcat $ intersperse (B.singleton '\t') $  map (flip evalToBuilder v) ks
+
 evalToList :: [KeyPath] -> Value -> [Text]
 evalToList ks v = map (flip evalToText v) ks
+
+evalToBuilder :: KeyPath -> Value -> B.Builder
+evalToBuilder k v = valToBuilder $ evalKeyPath k v
 
 evalToText :: KeyPath -> Value -> Text
 evalToText k v = valToText $ evalKeyPath k v
@@ -93,6 +103,17 @@ evalKeyPath (Index idx:ks) (Array v) =
         Nothing -> Null
 evalKeyPath ((Index _):_) _ = Null
 evalKeyPath _ _ = Null
+
+valToBuilder :: Value -> B.Builder
+valToBuilder (String x) = B.fromText x
+valToBuilder Null = B.fromText "NULL"
+valToBuilder (Bool True) = B.fromText "T"
+valToBuilder (Bool False) = B.fromText "F"
+valToBuilder (Number x) = 
+    case floatingOrInteger x of
+        Left float -> B.realFloat float
+        Right int -> B.decimal int
+valToBuilder (Object _) = B.fromText "[Object]"
 
 valToText :: Value -> Text
 valToText (String x) = x
