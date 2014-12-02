@@ -3,6 +3,44 @@
 A simple tool to transform JSON into tab-separated line-oriented output
 amenable to Unix text processing. 
 
+## Example
+
+input.json:
+
+```json
+{
+  "title": "Terminator 2: Judgement Day",
+  "year": 1991,
+  "stars": [
+    "Arnold Schwarzenegger",
+    "Linda Hamilton"
+  ],
+  "ratings": {
+    "imdb": 8.5
+  }
+}
+{
+  "title": "Interstellar",
+  "year": 2014,
+  "stars": [
+    "Matthew McConaughey",
+    "Anne Hathaway"
+  ],
+  "ratings": {
+    "imdb": 8.9
+  }
+}
+```
+
+    jsontsv 'title year stars ratings.imdb' < input.json
+
+Outputs this tab-separated text:
+
+```tsv
+Terminator 2: Judgement Day	1991	Arnold Schwarzenegger,Linda Hamilton	8.5
+Interstellar	2014	Matthew McConaughey,Anne Hathaway	8.9
+```
+
 ## Setup
 
 From the project directory, 
@@ -13,10 +51,13 @@ Make sure the installed executable is on your PATH.
 
 ## Usage
 
-Input should be a stream of JSON objects with mostly uniform keys.
+Input should be a stream of JSON objects with mostly uniform keys, separated by
+whitespace such as newlines. If the objects are wrapped in a JSON array at the
+top level, use the `jq` tool by Stephan Dolan to unwrap the objects, e.g.: 
 
-Output keys must be specified. If none are specified, all the top-level keys of
-the first object are taken as the template.
+    cat input.json | jq -M '.[]' | jsontsv 'id name owner.login'
+
+Output keys must be specified. 
 
     jsontsv 'title rating url' < input.json
 
