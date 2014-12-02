@@ -50,13 +50,13 @@ pKeyPaths :: AT.Parser [KeyPath]
 pKeyPaths = pKeyPath `AT.sepBy` spaces
 
 pKeyPath :: AT.Parser KeyPath
-pKeyPath = AT.sepBy1 pKeyOrIndex (AT.takeWhile1 $ AT.inClass ".[]")
+pKeyPath = AT.sepBy1 pKeyOrIndex (AT.takeWhile1 $ AT.inClass ".[")
 
 pKeyOrIndex = pIndex <|> pKey
 
 pKey = Key <$> AT.takeWhile1 (AT.notInClass " .[")
 
-pIndex = Index <$> AT.decimal 
+pIndex = Index <$> AT.decimal <* AT.char ']'
 
 type KeyPath = [Key]
 data Key = Key Text | Index Int deriving (Eq, Show)
