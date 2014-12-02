@@ -56,12 +56,12 @@ whitespace such as newlines. If the objects are wrapped in a JSON array at the
 top level, use the `jq` tool by Stephan Dolan to unwrap the objects, e.g.: 
 
     curl -s "https://api.github.com/users/danchoi/repos?type=owner&sort=created&direction=desc" \
-        | jq '.[]' | jsontsv 'id name stargazers_count watchers_count' 
+        | jq '.[]' | jsontsv 'id name stargazers_count open_issues_count' 
 
 outputs
 
     27397673        jsontsv 0       0
-    26033118        ngrender        24      24
+    26033118        ngrender        24      1
     25832026        rdoc    0       0
     24756523        treehtml        0       0
     24022588        heistexamples   0       0
@@ -69,7 +69,7 @@ outputs
     24005242        jdiff   0       0
     23997156        https-types     0       0
     22763562        podcasting      0       0
-    19294791        vimscript       3       3
+    19294791        vimscript       3       0
 
 JSON leaf values are printed as follows: 
 
