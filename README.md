@@ -67,6 +67,18 @@ Make sure the installed executable is on your PATH.
 
 ## Usage
 
+```
+jsontsv
+
+Usage: jsontsv FIELDS ([-c|--csv] | [-d DELIM])
+  Transform JSON objects to TSV
+
+Available options:
+  -h,--help                Show this help text
+  -c,--csv                 output CSV
+  -d DELIM                 output field delimiter. Defaults to tab
+```
+
 Input should be a stream of JSON objects of the same or mostly similar shape,
 separated by whitespace such as newlines. If the objects are wrapped in a JSON
 array at the top level or nested inside a top-level object, use the [jq][jq]

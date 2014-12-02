@@ -22,15 +22,32 @@ import System.Environment (getArgs)
 import qualified Data.Text.Lazy.Builder as B
 import qualified Data.Text.Lazy.Builder.Int as B
 import qualified Data.Text.Lazy.Builder.RealFloat as B
+import qualified Options.Applicative as O
+import qualified Text.CSV as CSV
+
+data Options = Options { jsonExpr :: String, outputMode :: OutputMode } deriving Show
+
+data OutputMode = TSVOutput { delimiter :: String } | CSVOutput deriving (Show)
+
+parseOpts :: O.Parser Options
+parseOpts = Options 
+  <$> O.argument O.str (O.metavar "FIELDS")
+  <*> ((O.flag' CSVOutput (O.short 'c' <> O.long "csv" <> O.help "output CSV"))
+       <|> (TSVOutput <$> (O.strOption (O.metavar "DELIM" <> O.value "\t" <> O.short 'd' <> O.help "output field delimiter. Defaults to tab"))))
+
+opts = O.info (O.helper <*> parseOpts)
+          (O.fullDesc <> O.progDesc "Transform JSON objects to TSV" <> O.header "jsontsv")
 
 main = do
-    x <- BL.getContents 
-    let xs :: [Value]
-        xs = decodeStream x
-    (ks:_) <- getArgs 
-    let ks' = parseKeyPath $ T.pack ks
-    -- Prelude.putStrLn $ "key Paths " ++ show ks'
-    mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder ks') xs
+  Options expr mode <- O.execParser opts
+  x <- BL.getContents 
+  let xs :: [Value]
+      xs = decodeStream x
+  let ks' = parseKeyPath $ T.pack expr
+  -- Prelude.putStrLn $ "key Paths " ++ show ks'
+  case mode of 
+    TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder delim ks') xs
+    CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList ks') $  xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
 decodeStream bs = case decodeWith json bs of
@@ -69,8 +86,8 @@ pIndex = Index <$> AT.decimal <* AT.char ']'
 type KeyPath = [Key]
 data Key = Key Text | Index Int deriving (Eq, Show)
 
-evalToLineBuilder :: [KeyPath] -> Value -> B.Builder 
-evalToLineBuilder ks v = mconcat $ intersperse (B.singleton '\t') $  map (flip evalToBuilder v) ks
+evalToLineBuilder :: String -> [KeyPath] -> Value -> B.Builder 
+evalToLineBuilder delim ks v = mconcat $ intersperse (B.fromText . T.pack $ delim) $  map (flip evalToBuilder v) ks
 
 evalToList :: [KeyPath] -> Value -> [Text]
 evalToList ks v = map (flip evalToText v) ks

@@ -2,7 +2,7 @@
 --  see http://haskell.org/cabal/users-guide/
 
 name:                jsontsv
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            JSON to TSV transformer
 homepage:            https://github.com/danchoi/jsontsv
 description:         Transforms JSON into tab-separated line-oriented output, for easier processing in Unix-style pipelines.
@@ -26,4 +26,6 @@ executable jsontsv
                      , text >= 1.2.0.0
                      , vector
                      , scientific
+                     , optparse-applicative
+                     , csv >= 0.1.2
   default-language:    Haskell2010
