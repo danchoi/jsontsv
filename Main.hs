@@ -106,9 +106,9 @@ evalKeyPath _ _ = Null
 
 valToBuilder :: Value -> B.Builder
 valToBuilder (String x) = B.fromText x
-valToBuilder Null = B.fromText "NULL"
-valToBuilder (Bool True) = B.fromText "T"
-valToBuilder (Bool False) = B.fromText "F"
+valToBuilder Null = B.fromText "null"
+valToBuilder (Bool True) = B.fromText "t"
+valToBuilder (Bool False) = B.fromText "f"
 valToBuilder (Number x) = 
     case floatingOrInteger x of
         Left float -> B.realFloat float
