@@ -20,12 +20,12 @@ executable jsontsv
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.7 && <4.8
-                     , aeson
+                     , aeson >= 0.8.0.0
                      , bytestring
-                     , attoparsec
+                     , attoparsec >= 0.12.1.0
                      , containers
                      , unordered-containers
-                     , text
+                     , text >= 1.2.0.0
                      , vector
                      , scientific
   -- hs-source-dirs:      
