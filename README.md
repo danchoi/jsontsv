@@ -100,3 +100,4 @@ Use awk!
 ## Known alternatives 
 
 * [jsawk](https://github.com/micha/jsawk) 
+* [jq][jq]
