@@ -27,4 +27,3 @@ executable jsontsv
                      , vector
                      , scientific
   default-language:    Haskell2010
-  ghc-options: -O2
