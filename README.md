@@ -1,7 +1,7 @@
 # jsontsv
 
 A simple tool to transform JSON into tab-separated line-oriented output
-amenable to Unix text processing. 
+amenable to downstream Unix text processing. 
 
 ## Synopsis
 
@@ -55,7 +55,8 @@ Input should be a stream of JSON objects with mostly uniform keys, separated by
 whitespace such as newlines. If the objects are wrapped in a JSON array at the
 top level, use the `jq` tool by Stephan Dolan to unwrap the objects, e.g.: 
 
-    cat input.json | jq -M '.[]' | jsontsv 'id name owner.login'
+    curl "https://api.github.com/users/danchoi/repos" | 
+        jq -M '.[]' | jsontsv 'id name owner.login'
 
 JSON leaf values are printed as follows: 
 
