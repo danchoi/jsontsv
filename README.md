@@ -1,7 +1,7 @@
 # jsontsv
 
 Transforms JSON objects into tab-separated line-oriented output, which is more
-convenient for downstream proessing with Unix tools like `grep` and `awk`.
+convenient for downstream processing with Unix tools like `grep` and `awk`.
 
 ## Synopsis
 
