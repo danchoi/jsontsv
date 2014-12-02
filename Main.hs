@@ -134,9 +134,9 @@ valToBuilder (Object _) = B.fromText "[Object]"
 
 valToText :: Value -> Text
 valToText (String x) = x
-valToText Null = "NULL"
-valToText (Bool True) = "T"
-valToText (Bool False) = "F"
+valToText Null = "null"
+valToText (Bool True) = "t"
+valToText (Bool False) = "f"
 valToText (Number x) = 
     case floatingOrInteger x of
         Left float -> T.pack . show $ float
