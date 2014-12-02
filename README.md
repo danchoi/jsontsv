@@ -34,7 +34,7 @@ input.json:
 
     jsontsv 'title year stars ratings.imdb' < input.json
 
-Outputs this tab-separated text:
+outputs this tab-separated text:
 
 ```tsv
 Terminator 2: Judgement Day	1991	Arnold Schwarzenegger,Linda Hamilton	8.5
@@ -44,6 +44,8 @@ Interstellar	2014	Matthew McConaughey,Anne Hathaway	8.9
 You can pick off array elements using `[i]` syntax:
 
     jsontsv 'title year stars[0]' < input.json
+
+outputs 
 
 ```tsv
 Terminator 2: Judgement Day     1991    Arnold Schwarzenegger
