@@ -18,7 +18,7 @@ input.json:
   "ratings": {
     "imdb": 8.5
   }
-}
+},
 {
   "title": "Interstellar",
   "year": 2014,
