@@ -35,3 +35,20 @@ https://hackage.haskell.org/package/attoparsec-0.12.1.2/docs/Data-Attoparsec-Byt
 jsonEOF :: Parser Value
 jsonEOF = json <* skipSpace <* endOfInput
 
+
+
+
+sepBy1 :: Alternative f => f a -> f s -> f [a]
+sepBy1 p s = scan
+    where scan = liftA2 (:) p ((s *> scan) <|> pure [])
+
+scan :: s -> (s -> Char -> Maybe s) -> Parser Text
+
+A stateful scanner. The predicate consumes and transforms a state argument, and each transformed state is passed to successive invocations of the predicate on each character of the input until one returns Nothing or the input ends.
+
+This parser does not fail. It will return an empty string if the predicate returns Nothing on the first character of input.
+
+Note: Because this parser does not fail, do not use it with combinators such as many, because such parsers loop until a failure occurs. Careless use will thus result in an infinite loop.
+
+Control.Applicative liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
+

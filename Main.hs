@@ -39,20 +39,27 @@ decodeWith p to s =
                       Success a -> Just a 
                       _ -> Nothing) $ to v
 
-parseKeyPath :: Text -> [[Text]]
+parseKeyPath :: Text -> [KeyPath]
 parseKeyPath s = case AT.parseOnly pKeyPaths s of
     Left err -> error $ "Parse error " ++ err 
     Right res -> res
 
 spaces = many1 AT.space
 
-pKeyPaths :: AT.Parser [[Text]]
+pKeyPaths :: AT.Parser [KeyPath]
 pKeyPaths = pKeyPath `AT.sepBy` spaces
 
-pKeyPath :: AT.Parser [Text]
-pKeyPath = (AT.takeWhile1 (AT.notInClass " .")) `AT.sepBy` (AT.char '.')
+pKeyPath :: AT.Parser KeyPath
+pKeyPath = AT.sepBy1 pKeyOrIndex (AT.takeWhile1 $ AT.inClass ".[]")
 
-type KeyPath = [Text]
+pKeyOrIndex = pIndex <|> pKey
+
+pKey = Key <$> AT.takeWhile1 (AT.notInClass " .[")
+
+pIndex = Index <$> AT.decimal 
+
+type KeyPath = [Key]
+data Key = Key Text | Index Int deriving (Eq, Show)
 
 evalToList :: [KeyPath] -> Value -> [Text]
 evalToList ks v = map (flip evalToText v) ks
@@ -67,15 +74,20 @@ evalKeyPath [] x@Null = x
 evalKeyPath [] x@(Number _) = x
 evalKeyPath [] x@(Bool _) = x
 evalKeyPath [] x@(Object _) = x
-evalKeyPath [] x@(Array _) = x
-evalKeyPath (key:ks) (Object s) = 
-    case (HM.lookup key s) of
-        Just (Array v) -> 
+evalKeyPath [] x@(Array v) = 
           let vs = V.toList v
-              xs = intersperse "," $ map (evalToText ks) vs
+              xs = intersperse "," $ map (evalToText []) vs
           in String . mconcat $ xs
+evalKeyPath (Key key:ks) (Object s) = 
+    case (HM.lookup key s) of
         Just x          -> evalKeyPath ks x
         Nothing -> Null
+evalKeyPath (Index idx:ks) (Array v) = 
+      let e = (V.!?) v idx
+      in case e of 
+        Just e' -> evalKeyPath ks e'
+        Nothing -> Null
+evalKeyPath ((Index _):_) _ = Null
 evalKeyPath _ _ = Null
 
 valToText :: Value -> Text
