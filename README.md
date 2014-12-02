@@ -63,7 +63,7 @@ Make sure the installed executable is on your PATH.
 
 ## Usage
 
-Input should be a stream of JSON objects with mostly uniform keys, separated by
+Input should be a stream of JSON objects of the same or mostly similar shape, separated by
 whitespace such as newlines. If the objects are wrapped in a JSON array at the
 top level, use the [jq][jq] tool by Stephan Dolan to unwrap the objects, e.g.: 
 
