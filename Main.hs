@@ -40,7 +40,7 @@ evalToList :: [KeyPath] -> Value -> [Text]
 evalToList ks v = map (flip evalToText v) ks
 
 evalToText :: KeyPath -> Value -> Text
-evalToText k v = valToString $ evalKeyPath k v
+evalToText k v = valToText $ evalKeyPath k v
 
 -- evaluates the a JS key path against a Value context to a leaf Value
 evalKeyPath :: KeyPath -> Value -> Value
@@ -59,14 +59,14 @@ evalKeyPath (key:ks) (Object s) =
         Just x          -> evalKeyPath ks x
 evalKeyPath _ _ = Null
 
-valToString :: Value -> Text
-valToString (String x) = x
-valToString Null = ""
-valToString (Bool True) = "true"
-valToString (Bool False) = "false"
-valToString (Number x) = 
+valToText :: Value -> Text
+valToText (String x) = x
+valToText Null = ""
+valToText (Bool True) = "true"
+valToText (Bool False) = "false"
+valToText (Number x) = 
     case floatingOrInteger x of
         Left float -> T.pack . show $ float
         Right int -> T.pack . show $ int
-valToString (Object _) = "[Object]"
+valToText (Object _) = "[Object]"
 
