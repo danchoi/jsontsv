@@ -52,3 +52,34 @@ Note: Because this parser does not fail, do not use it with combinators such as 
 
 Control.Applicative liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
 
+
+http://hackage.haskell.org/package/attoparsec-0.12.1.2/docs/Data-Attoparsec-Text.html#v:Partial
+
+Incremental input
+
+attoparsec supports incremental input, meaning that you can feed it a Text that
+represents only part of the expected total amount of data to parse. If your
+parser reaches the end of a fragment of input and could consume more input, it
+will suspend parsing and return a Partial continuation.
+
+Supplying the Partial continuation with another string will resume parsing at
+the point where it was suspended, with the string you supplied used as new
+input at the end of the existing input. You must be prepared for the result of
+the resumed parse to be another Partial continuation.
+
+To indicate that you have no more input, supply the Partial continuation with
+an empty Text.
+
+Remember that some parsing combinators will not return a result until they
+reach the end of input. They may thus cause Partial results to be returned.
+
+If you do not need support for incremental input, consider using the parseOnly
+function to run your parser. It will never prompt for more input.
+
+Note: incremental input does not imply that attoparsec will release portions of
+its internal state for garbage collection as it proceeds. Its internal
+representation is equivalent to a single Text: if you feed incremental input to
+an a parser, it will require memory proportional to the amount of input you
+supply. (This is necessary to support arbitrary backtracking.)
+
+

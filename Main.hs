@@ -29,15 +29,19 @@ main = do
     mapM_ (print . evalToList ks') xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
-decodeStream = decodeWith (json `sepBy` endOfLine) fromJSON
+decodeStream bs = case decodeWith json bs of
+    (Just x, xs) | xs == mempty -> [x]
+    (Just x, xs) -> x:(decodeStream xs)
+    (Nothing, _) -> []
 
-decodeWith :: (FromJSON a) => Parser [Value] -> (Value -> Result a) -> BL.ByteString -> [a]
-decodeWith p to s =
+decodeWith :: (FromJSON a) => Parser Value -> BL.ByteString -> (Maybe a, BL.ByteString)
+decodeWith p s =
     case Atto.parse p s of
-      Atto.Done _ vs -> catMaybes $ map f vs 
-  where f v = (\x -> case x of 
-                      Success a -> Just a 
-                      _ -> Nothing) $ to v
+      Atto.Done r v -> f v r
+      Atto.Fail _ _ _ -> (Nothing, mempty)
+  where f v' r = (\x -> case x of 
+                      Success a -> (Just a, r)
+                      _ -> (Nothing, r)) $ fromJSON v'
 
 parseKeyPath :: Text -> [KeyPath]
 parseKeyPath s = case AT.parseOnly pKeyPaths s of
