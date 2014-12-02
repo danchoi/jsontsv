@@ -3,7 +3,7 @@
 A simple tool to transform JSON into tab-separated line-oriented output
 amenable to Unix text processing. 
 
-## Example
+## Synopsis
 
 input.json:
 
@@ -57,16 +57,12 @@ top level, use the `jq` tool by Stephan Dolan to unwrap the objects, e.g.:
 
     cat input.json | jq -M '.[]' | jsontsv 'id name owner.login'
 
-Output keys must be specified. 
+JSON leaf values are printed as follows: 
 
-    jsontsv 'title rating url' < input.json
-
-Terminal values. If the key maps to a scalar value or Null, it is printed to
-the column. 
-
-If it any key in a series maps to an array, and it is the last key, the values
-are output separated by ",". If key is not the final key, the following keys
-are mapped to the objects that assumed to populate the array.
+* Strings and numbers were copied to output.
+* Boolean values are output as `t` or `f`.
+* null is printed as `null`
+* Arrays of leaf values are concatenated into a single comma-separated string
 
 ## Nested keys
 
