@@ -6,10 +6,12 @@ import qualified Data.Map.Strict as M
 import Data.Text (Text)
 import qualified Data.Text.Encoding as T (decodeUtf8)
 import Data.List (intersperse)
+import qualified Data.List 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy.IO as TL
 import Data.Maybe (catMaybes)
 import Control.Applicative
+import Control.Monad (when)
 import Data.ByteString.Lazy as BL hiding (map, intersperse)
 import qualified Data.ByteString.Lazy.Char8 as BS
 import Data.Attoparsec.Lazy as Atto hiding (Result)
@@ -25,31 +27,42 @@ import qualified Data.Text.Lazy.Builder.RealFloat as B
 import qualified Options.Applicative as O
 import qualified Text.CSV as CSV
 
-data Options = Options { jsonExpr :: String, arrayDelim :: String, outputMode :: OutputMode } deriving Show
+data Options = Options { jsonExpr :: String, arrayDelim :: String, outputMode :: OutputMode, showHeader :: Bool } deriving Show
 
 data OutputMode = TSVOutput { delimiter :: String } | CSVOutput deriving (Show)
 
 parseOpts :: O.Parser Options
 parseOpts = Options 
   <$> O.argument O.str (O.metavar "FIELDS")
-  <*> O.strOption (O.metavar "STRING" <> O.value "," <> O.short 'a' <> O.help "concatentated array elem delimiter. Defaults to comma")
-  <*> ((O.flag' CSVOutput (O.short 'c' <> O.long "csv" <> O.help "output CSV"))
-       <|> (TSVOutput <$> (O.strOption (O.metavar "STRING" <> O.value "\t" <> O.short 'd' <> O.help "output field delimiter. Defaults to tab"))))
+  <*> O.strOption (O.metavar "STRING" <> O.value "," <> O.short 'a' <> O.help "Concatentated array elem delimiter. Defaults to comma.")
+  <*> (parseCSVMode <|> parseTSVMode)
+  <*> O.flag False True (O.short 'H' <> O.help "Include headers")
+
+parseCSVMode = O.flag' CSVOutput (O.short 'c' <> O.long "csv" <> O.help "Output CSV")
+
+parseTSVMode = TSVOutput 
+    <$> (O.strOption 
+          (O.metavar "STRING" <> O.value "\t" <> O.short 'd' <> O.help "Output field delimiter. Defaults to tab."))
 
 opts = O.info (O.helper <*> parseOpts)
           (O.fullDesc <> O.progDesc "Transform JSON objects to TSV" <> O.header "jsontsv")
 
 main = do
-  Options expr arrayDelim mode <- O.execParser opts
+  Options expr arrayDelim mode showHeaders <- O.execParser opts
   x <- BL.getContents 
   let xs :: [Value]
       xs = decodeStream x
-      ks' = parseKeyPath $ T.pack expr
+      ks = parseKeyPath $ T.pack expr
       arrayDelim' = T.pack arrayDelim
-  -- Prelude.putStrLn $ "key Paths " ++ show ks'
+  -- Prelude.putStrLn $ "key Paths " ++ show ks
+  when showHeaders $ do
+    let hs = words expr
+    case mode of 
+      TSVOutput delim -> Prelude.putStrLn . Data.List.intercalate delim $ hs
+      CSVOutput -> Prelude.putStrLn . CSV.printCSV $ [hs]
   case mode of 
-    TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder arrayDelim' delim ks') xs
-    CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList arrayDelim' ks') $  xs
+    TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder arrayDelim' delim ks) xs
+    CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList arrayDelim' ks) $  xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
 decodeStream bs = case decodeWith json bs of
