@@ -2,8 +2,8 @@
 
 Transforms JSON objects into delimiter-separated line-oriented output, which is
 more convenient for downstream processing with Unix tools like `grep`, `awk`,
-`diff`, etc. Also useful for converting JSON data into spreadsheet data. CSV-style
-output is also supported.
+`diff`, etc. Also useful for converting JSON data into spreadsheet data: CSV-style
+output is supported.
 
 ## Synopsis
 
