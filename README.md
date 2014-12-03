@@ -11,7 +11,7 @@ input:
 
 ```json
 {
-  "title": "Terminator 2: Judgement Day",
+  "title": "Terminator 2: Judgment Day",
   "year": 1991,
   "stars": [
     {
@@ -50,7 +50,7 @@ JSON objects. It can be fed into `jsontsv`:
 outputs this tab-separated text:
 
 ```tsv
-Terminator 2: Judgement Day	1991	Arnold Schwarzenegger,Linda Hamilton	8.5
+Terminator 2: Judgment Day	1991	Arnold Schwarzenegger,Linda Hamilton	8.5
 Interstellar	2014	Matthew McConaughey,Anne Hathaway	8.9
 ```
 
@@ -61,7 +61,7 @@ You can pick off array elements using `[i]` syntax:
 outputs 
 
 ```tsv
-Terminator 2: Judgement Day     1991    Arnold Schwarzenegger
+Terminator 2: Judgment Day     1991    Arnold Schwarzenegger
 Interstellar    2014    Matthew McConaughey
 ```
 
