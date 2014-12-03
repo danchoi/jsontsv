@@ -121,9 +121,9 @@ JSON leaf values are printed as follows:
 * If the leaf value is an array, it is concatenated into a single
   comma-separated string. This delimiter can be changed with the `-a` option.
 
-## Performing post-processing on field values
+## Post-processing output field values
 
-Use awk!
+`awk` is great for this.
 
 ## Known alternatives 
 
