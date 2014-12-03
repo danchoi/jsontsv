@@ -1,9 +1,9 @@
 # jsontsv
 
-Transforms JSON objects into tab-separated line-oriented output, which is more
-convenient for downstream processing with Unix tools like `grep`, `awk`,
-`diff`, etc., and for inspecting with spreadsheet programs using a CSV output
-option.
+Transforms JSON objects into delimiter-separated line-oriented output, which is
+more convenient for downstream processing with Unix tools like `grep`, `awk`,
+`diff`, etc. Also useful for converting JSON data into spreadsheet data. CSV-style
+output is also supported.
 
 ## Synopsis
 
