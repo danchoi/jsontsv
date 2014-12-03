@@ -147,6 +147,7 @@ Use awk!
 
 ## Known alternatives 
 
-* [jsawk](https://github.com/micha/jsawk) 
+* [jsawk](https://github.com/micha/jsawk) Jsawk is like awk, but for JSON. (nodejs)
 * [jq][jq]
-* [jsoncsv](https://github.com/gradus/jsoncsv)
+* [jsoncsv](https://github.com/gradus/jsoncsv) a json to csv library in javascript/coffeescript
+* [json](https://github.com/konklone/json) A free, in-browser JSON to CSV converter.
