@@ -118,6 +118,10 @@ evalKeyPath (Index idx:ks) (Array v) =
       in case e of 
         Just e' -> evalKeyPath ks e'
         Nothing -> Null
+-- traverse array elements with additional keys
+evalKeyPath ks@(Key key:_) (Array v) = 
+      let vs = V.toList v
+      in String . mconcat . intersperse "," $ map (evalToText ks) vs
 evalKeyPath ((Index _):_) _ = Null
 evalKeyPath _ _ = Null
 

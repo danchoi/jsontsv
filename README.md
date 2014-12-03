@@ -32,12 +32,42 @@ input.json:
     "imdb": 8.9
   }
 }
+{
+  "title": "Terminator 2: Judgement Day",
+  "year": 1991,
+  "stars": [
+    {
+      "name": "Arnold Schwarzenegger"
+    },
+    {
+      "name": "Linda Hamilton"
+    }
+  ],
+  "ratings": {
+    "imdb": 8.5
+  }
+}
+{
+  "title": "Interstellar",
+  "year": 2014,
+  "stars": [
+    {
+      "name": "Matthew McConaughey"
+    },
+    {
+      "name": "Anne Hathaway"
+    }
+  ],
+  "ratings": {
+    "imdb": 8.9
+  }
+}
 ```
 
 Note that this input is not actually JSON at the top-level. It is a stream of
 JSON objects. It can be fed into `jsontsv`:
 
-    jsontsv 'title year stars ratings.imdb' < input.json
+    jsontsv 'title year stars.name ratings.imdb' < input.json
 
 outputs this tab-separated text:
 
@@ -48,7 +78,7 @@ Interstellar	2014	Matthew McConaughey,Anne Hathaway	8.9
 
 You can pick off array elements using `[i]` syntax:
 
-    jsontsv 'title year stars[0]' < input.json
+    jsontsv 'title year stars[0].name' < input.json
 
 outputs 
 
