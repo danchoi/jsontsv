@@ -158,4 +158,10 @@ JSON leaf values are printed as follows:
 * [json2csv](https://github.com/jehiah/json2csv) made with Go
 * [jq][jq]
 * [jsoncsv](https://github.com/gradus/jsoncsv) a json to csv library in javascript/coffeescript
-* [json](https://github.com/konklone/json) A free, in-browser JSON to CSV converter.
+* [json](https://github.com/konklone/json) A free, in-browser JSON to CSV converter
+
+## Related
+
+* [Seven command line tools for data
+  science](http://jeroenjanssens.com/2013/09/19/seven-command-line-tools-for-data-science.html)
+  A blog post surveying tools like this
