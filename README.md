@@ -155,6 +155,7 @@ JSON leaf values are printed as follows:
 ## Known alternatives 
 
 * [jsawk](https://github.com/micha/jsawk) Jsawk is like awk, but for JSON. (nodejs)
+* [json2csv](https://github.com/jehiah/json2csv) made with Go
 * [jq][jq]
 * [jsoncsv](https://github.com/gradus/jsoncsv) a json to csv library in javascript/coffeescript
 * [json](https://github.com/konklone/json) A free, in-browser JSON to CSV converter.
