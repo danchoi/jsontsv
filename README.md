@@ -119,7 +119,7 @@ JSON leaf values are printed as follows:
 * Boolean values are output as `t` or `f`.
 * null is printed as `null`
 * If the leaf value is an array, it is concatenated into a single
-  comma-separated string. The delimiter can be changed with the `-a` option.
+  comma-separated string. This delimiter can be changed with the `-a` option.
 
 ## Performing post-processing on field values
 
