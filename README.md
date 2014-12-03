@@ -80,11 +80,12 @@ Make sure the installed executable is on your PATH.
 ```
 jsontsv
 
-Usage: jsontsv FIELDS ([-c|--csv] | [-d DELIM])
+Usage: jsontsv FIELDS [-a ARRAY-DELIM] ([-c|--csv] | [-d DELIM])
   Transform JSON objects to TSV
 
 Available options:
   -h,--help                Show this help text
+  -a ARRAY-DELIM           concatentated array element delimiter. Defaults to comma
   -c,--csv                 output CSV
   -d DELIM                 output field delimiter. Defaults to tab
 ```
@@ -117,7 +118,8 @@ JSON leaf values are printed as follows:
 * Strings and numbers are copied to output.
 * Boolean values are output as `t` or `f`.
 * null is printed as `null`
-* If the leaf value is an array, it is concatenated into a single comma-separated string
+* If the leaf value is an array, it is concatenated into a single
+  comma-separated string. The delimiter can be changed with the `-a` option.
 
 ## Performing post-processing on field values
 
