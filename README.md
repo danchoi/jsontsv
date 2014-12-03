@@ -80,14 +80,14 @@ Make sure the installed executable is on your PATH.
 ```
 jsontsv
 
-Usage: jsontsv FIELDS [-a ARRAY-DELIM] ([-c|--csv] | [-d DELIM])
+Usage: jsontsv FIELDS [-a STRING] ([-c|--csv] | [-d STRING])
   Transform JSON objects to TSV
 
 Available options:
   -h,--help                Show this help text
-  -a ARRAY-DELIM           concatentated array element delimiter. Defaults to comma
+  -a STRING                concatentated array elem delimiter. Default to comma
   -c,--csv                 output CSV
-  -d DELIM                 output field delimiter. Defaults to tab
+  -d STRING                output field delimiter. Defaults to tab
 ```
 
 Input should be a stream of JSON objects of the same or mostly similar shape,

@@ -32,9 +32,9 @@ data OutputMode = TSVOutput { delimiter :: String } | CSVOutput deriving (Show)
 parseOpts :: O.Parser Options
 parseOpts = Options 
   <$> O.argument O.str (O.metavar "FIELDS")
-  <*> O.strOption (O.metavar "ARRAY-DELIM" <> O.value "," <> O.short 'a' <> O.help "concatentated array elem delimiter. Default to comma")
+  <*> O.strOption (O.metavar "STRING" <> O.value "," <> O.short 'a' <> O.help "concatentated array elem delimiter. Default to comma")
   <*> ((O.flag' CSVOutput (O.short 'c' <> O.long "csv" <> O.help "output CSV"))
-       <|> (TSVOutput <$> (O.strOption (O.metavar "DELIM" <> O.value "\t" <> O.short 'd' <> O.help "output field delimiter. Defaults to tab"))))
+       <|> (TSVOutput <$> (O.strOption (O.metavar "STRING" <> O.value "\t" <> O.short 'd' <> O.help "output field delimiter. Defaults to tab"))))
 
 opts = O.info (O.helper <*> parseOpts)
           (O.fullDesc <> O.progDesc "Transform JSON objects to TSV" <> O.header "jsontsv")
