@@ -98,27 +98,45 @@ tool by Stephan Dolan to extract an object stream, e.g.:
 
 [jq]:http://stedolan.github.io/jq/
 
-    curl -s "https://api.github.com/users/danchoi/repos?sort=created&direction=desc" \
-        | jq '.[]' | jsontsv -H 'id name stargazers_count open_issues_count' 
+    curl -s "https://api.github.com/repos/rails/rails/issues" | 
+    jq -M '.[]' | 
+    jsontsv -H 'number title user.login state repository.name labels.name'
 
 outputs
 
-    id      name    stargazers_count        open_issues_count
-    27397673        jsontsv 3       1
-    26033118        ngrender        24      1
-    25832026        rdoc    0       0
-    24756523        treehtml        0       0
-    24022588        heistexamples   0       0
-    24022042        hxtexamples     0       0
-    24005242        jdiff   0       0
-    23997156        https-types     0       0
-    22763562        podcasting      0       0
-    19294791        vimscript       3       0
-    19208399        hnb     0       0
-    19068777        lens-experiments        0       0
-    18560550        data-yaml       0       0
-    17645075        hdbc-aeson      0       0
-    ...
+```
+number	title	user.login	state	repository.name	labels.name
+17894	Add default value for `create_table_definition`	kamipo	open	null	
+17893	Vendor/assets/images not being precompiled	runephilosof	open	null	
+17891	Removed use of mocha in the info_controller tests	prathamesh-sonpatki	open	null	
+17887	Wrong instance object passed to lambda on has_many :through	haruska	open	null	
+17885	Update postgresql_database_tasks.rb	starbelly	open	null	
+17884	Routes with {trailing_slash: true} do not match if referenced as non-named routes	dreyks	open	null	
+17880	Fix humanize for already upcased acronyms	mintuhouse	open	null	activesupport
+17879	humanize doesn't respect Infector acronyms	mintuhouse	open	null	activesupport
+17864	eager loading a has_many through association ignores order of through association	jturkel	open	null	
+17859	Includes HABTM returns correct size now	scambra	open	null	
+17858	test preloading a HABTM association with hash conditions	scambra	open	null	
+17854	Bug when using find_in_batches and reverse_order	robertjlooby	open	null	activerecord
+17853	Remove deprecated `reset_changes` and `reset_attribute!` methods.	kaspth	open	null	
+17851	Support for any type primary key	kamipo	open	null	
+17845	Don't leak Object constants in core_ext/module/qualified_const	gsamokovarov	open	null	
+17825	Fix Sidekiq ActiveJob integration setup	aripollak	open	null	activejob
+17824	AR::RecordNotSaved & RecordNotDestroyed from save!/destroy! should include an error message	yuki24	open	null	
+17822	Refactor `visit_ChangeColumnDefinition`	kamipo	open	null	
+17820	Clear query cache on rollback	fw42	open	null	
+17819	handle_positional_args does not work properly in route with format: false option	vevisystems	open	null	actionpack
+17817	Hide potentially sensitive ActiveJob params from logs	aripollak	open	null	activejob
+17815	Remove custom errors page section from the guides	yuki24	open	null	
+17813	Changed welcome#index page overall look and feel	wazery	open	null	railties
+17804	Null values will still be passed to custom serializers.	xaviershay	open	null	activerecord
+17797	Don't remove mailer layouts files	y-yagi	open	null	
+17795	ActiveRecord joins/includes bug	dgobaud	open	null	activerecord,regression
+17793	Fix undesirable RangeError by Type::Integer. Add Type::UnsignedInteger.	kamipo	open	null	activerecord
+17792	allow 'all' for :domain option in addition to :all	rockrep	open	null	
+17788	Issue#17703 Test case for tempfile attribute	sivagollapalli	open	null	
+17787	rails runner does not respect subdirectory / how to specify subdirectory?	doits	open	null	railties
+```
 
 JSON leaf values are printed as follows: 
 
