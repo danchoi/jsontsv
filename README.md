@@ -73,9 +73,9 @@ output up:
 outputs
 
 ```
-title                       year  stars[0].name
-Terminator 2: Judgment Day  1991  Arnold Schwarzenegger
-Interstellar                2014  Matthew McConaughey
+title                       year  stars.name                            ratings.imdb
+Terminator 2: Judgment Day  1991  Arnold Schwarzenegger,Linda Hamilton  8.5
+Interstellar                2014  Matthew McConaughey,Anne Hathaway     8.9
 ```
 
 ## Installation
