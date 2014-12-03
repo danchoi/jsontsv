@@ -85,7 +85,7 @@ Usage: jsontsv FIELDS [-a STRING] ([-c|--csv] | [-d STRING])
 
 Available options:
   -h,--help                Show this help text
-  -a STRING                concatentated array elem delimiter. Default to comma
+  -a STRING                concatentated array elem delimiter. Defaults to comma
   -c,--csv                 output CSV
   -d STRING                output field delimiter. Defaults to tab
 ```
