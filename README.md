@@ -97,7 +97,7 @@ tool by Stephan Dolan to extract an object stream, e.g.:
 
 [jq]:http://stedolan.github.io/jq/
 
-    curl -s "https://api.github.com/users/danchoi/repos?type=owner&sort=created&direction=desc" \
+    curl -s "https://api.github.com/users/danchoi/repos?sort=created&direction=desc" \
         | jq '.[]' | jsontsv 'id name stargazers_count open_issues_count' 
 
 outputs
