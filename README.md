@@ -165,6 +165,6 @@ JSON leaf values are printed as follows:
 * [Seven command line tools for data
   science](http://jeroenjanssens.com/2013/09/19/seven-command-line-tools-for-data-science.html) by Joeren Janssens.
   A blog post surveying tools like this
-* [Data Science at the Command Line: Facing the Future with Time-Tested Tools]
+* [Data Science at the Command Line: Facing the Future with Time-Tested Tools](http://shop.oreilly.com/product/0636920032823.do)
   by Joeren Janssens. A book published in September 2014 by O'Reilly.
 
