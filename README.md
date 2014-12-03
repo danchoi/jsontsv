@@ -65,8 +65,8 @@ Terminator 2: Judgment Day     1991    Arnold Schwarzenegger
 Interstellar    2014    Matthew McConaughey
 ```
 
-Use the `-H` flag to output the headers and the Unix tool `column` to dress the
-output up:
+Use the `-H` flag to output the headers and the Unix tool `column` to align the
+columns for prettier output:
 
     cat input | jsontsv -H 'title year stars.name ratings.imdb' | column -s $'\t' -t
 
