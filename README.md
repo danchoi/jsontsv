@@ -65,6 +65,18 @@ Terminator 2: Judgment Day     1991    Arnold Schwarzenegger
 Interstellar    2014    Matthew McConaughey
 ```
 
+Using the Unix tool `column` you can easily dress the output up:
+
+    cat input | jsontsv 'title year stars.name ratings.imdb' |
+    column -s $'\t' -t
+
+outputs
+
+```
+Terminator 2: Judgment Day  1991  Arnold Schwarzenegger,Linda Hamilton  8.5
+Interstellar                2014  Matthew McConaughey,Anne Hathaway     8.9
+```
+
 ## Installation
 
 Assuming you have a recent version of the [Haskell
@@ -106,7 +118,7 @@ tool by Stephan Dolan to extract an object stream, e.g.:
 
     curl -s "https://api.github.com/repos/rails/rails/issues" | 
     jq -M '.[]' | 
-    jsontsv -H 'number title user.login state repository.name labels.name'
+    jsontsv -H 'number title user.login state repository.name labels.name' 
 
 outputs
 
