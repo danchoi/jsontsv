@@ -67,8 +67,7 @@ Interstellar    2014    Matthew McConaughey
 
 Using the Unix tool `column` you can easily dress the output up:
 
-    cat input | jsontsv 'title year stars.name ratings.imdb' |
-    column -s $'\t' -t
+    cat input | jsontsv 'title year stars.name ratings.imdb' | column -s $'\t' -t
 
 outputs
 
