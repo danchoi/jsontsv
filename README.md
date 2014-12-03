@@ -99,11 +99,12 @@ tool by Stephan Dolan to extract an object stream, e.g.:
 [jq]:http://stedolan.github.io/jq/
 
     curl -s "https://api.github.com/users/danchoi/repos?sort=created&direction=desc" \
-        | jq '.[]' | jsontsv 'id name stargazers_count open_issues_count' 
+        | jq '.[]' | jsontsv -H 'id name stargazers_count open_issues_count' 
 
 outputs
 
-    27397673        jsontsv 0       0
+    id      name    stargazers_count        open_issues_count
+    27397673        jsontsv 3       1
     26033118        ngrender        24      1
     25832026        rdoc    0       0
     24756523        treehtml        0       0
@@ -113,6 +114,11 @@ outputs
     23997156        https-types     0       0
     22763562        podcasting      0       0
     19294791        vimscript       3       0
+    19208399        hnb     0       0
+    19068777        lens-experiments        0       0
+    18560550        data-yaml       0       0
+    17645075        hdbc-aeson      0       0
+    ...
 
 JSON leaf values are printed as follows: 
 
