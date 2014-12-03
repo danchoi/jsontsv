@@ -85,9 +85,9 @@ Usage: jsontsv FIELDS [-a DELIM] ([-c|--csv] | [-d DELIM]) [-H]
 
 Available options:
   -h,--help                Show this help text
-  -a DELIM                Concatentated array elem delimiter. Defaults to comma.
+  -a DELIM                 Concatentated array elem delimiter. Defaults to comma.
   -c,--csv                 Output CSV
-  -d DELIM                Output field delimiter. Defaults to tab.
+  -d DELIM                 Output field delimiter. Defaults to tab.
   -H                       Include headers
 ```
 
