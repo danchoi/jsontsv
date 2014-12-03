@@ -73,7 +73,13 @@ platform](https://www.haskell.org/platform/) on your system,
     cabal update
     cabal install jsontsv
 
-Make sure the installed executable is on your PATH.
+Alternatively, 
+
+    git clone git@github.com:danchoi/jsontsv.git
+    cd jsontsv
+    cabal sandbox init
+    cabal install 
+    # Now copy .cabal-sandbox/bin/jsontsv to your PATH
 
 ## Usage
 
