@@ -65,15 +65,17 @@ Terminator 2: Judgment Day     1991    Arnold Schwarzenegger
 Interstellar    2014    Matthew McConaughey
 ```
 
-Using the Unix tool `column` you can easily dress the output up:
+Use the `-H` flag to output the headers and the Unix tool `column` to dress the
+output up:
 
-    cat input | jsontsv 'title year stars.name ratings.imdb' | column -s $'\t' -t
+    cat input | jsontsv -H 'title year stars.name ratings.imdb' | column -s $'\t' -t
 
 outputs
 
 ```
-Terminator 2: Judgment Day  1991  Arnold Schwarzenegger,Linda Hamilton  8.5
-Interstellar                2014  Matthew McConaughey,Anne Hathaway     8.9
+title                       year  stars[0].name
+Terminator 2: Judgment Day  1991  Arnold Schwarzenegger
+Interstellar                2014  Matthew McConaughey
 ```
 
 ## Installation
