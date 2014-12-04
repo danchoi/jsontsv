@@ -169,10 +169,10 @@ JSON leaf values are printed as follows:
 
 * [jsawk](https://github.com/micha/jsawk) Jsawk is like awk, but for JSON. (nodejs)
 * [json2csv](https://github.com/jehiah/json2csv) made with Go
-* [jq][jq]
+* [jq][jq] a lightweight and flexible command-line JSON processor
 * [jsoncsv](https://github.com/gradus/jsoncsv) a json to csv library in javascript/coffeescript
 * [json](https://github.com/konklone/json) A free, in-browser JSON to CSV converter
-* [tsvutils](https://github.com/brendano/tsvutils)
+* [tsvutils](https://github.com/brendano/tsvutils) utilities for processing tab-separated files
 
 ## Related
 
