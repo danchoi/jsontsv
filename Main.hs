@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, QuasiQuotes #-}
 module Main where
 import Data.Aeson
 import Data.Monoid
@@ -26,6 +26,7 @@ import qualified Data.Text.Lazy.Builder.Int as B
 import qualified Data.Text.Lazy.Builder.RealFloat as B
 import qualified Options.Applicative as O
 import qualified Text.CSV as CSV
+import Data.String.QQ 
 
 data Options = Options { jsonExpr :: String, arrayDelim :: String, outputMode :: OutputMode, showHeader :: Bool } deriving Show
 
@@ -45,7 +46,11 @@ parseTSVMode = TSVOutput
           (O.metavar "DELIM" <> O.value "\t" <> O.short 'd' <> O.help "Output field delimiter. Defaults to tab."))
 
 opts = O.info (O.helper <*> parseOpts)
-          (O.fullDesc <> O.progDesc "Transform JSON objects to TSV" <> O.header "jsontsv")
+          (O.fullDesc 
+            <> O.progDesc [s| Transform JSON objects to TSV.  
+                    On STDIN provide an input stream of whitespace-separated JSON objects. |]
+            <> O.header "jsontsv v0.1.4.1"
+            <> O.footer "See https://github.com/danchoi/jsontsv for more information.")
 
 main = do
   Options expr arrayDelim mode showHeaders <- O.execParser opts
