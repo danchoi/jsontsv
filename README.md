@@ -181,4 +181,4 @@ JSON leaf values are printed as follows:
   A blog post surveying tools like this.
 * [Data Science at the Command Line: Facing the Future with Time-Tested Tools](http://shop.oreilly.com/product/0636920032823.do)
   by Jeroen Janssens. A book published in September 2014 by O'Reilly.
-
+* [jsontsv versus json2csv](https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/26) 
