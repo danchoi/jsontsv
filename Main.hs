@@ -28,7 +28,13 @@ import qualified Options.Applicative as O
 import qualified Text.CSV as CSV
 import Data.String.QQ 
 
-data Options = Options { jsonExpr :: String, arrayDelim :: String, outputMode :: OutputMode, showHeader :: Bool } deriving Show
+data Options = Options { 
+    jsonExpr :: String
+  , arrayDelim :: String
+  , outputMode :: OutputMode
+  , showHeader :: Bool
+  , debugKeyPaths :: Bool
+  } deriving Show
 
 data OutputMode = TSVOutput { delimiter :: String } | CSVOutput deriving (Show)
 
@@ -38,6 +44,7 @@ parseOpts = Options
   <*> O.strOption (O.metavar "DELIM" <> O.value "," <> O.short 'a' <> O.help "Concatentated array elem delimiter. Defaults to comma.")
   <*> (parseCSVMode <|> parseTSVMode)
   <*> O.flag False True (O.short 'H' <> O.help "Include headers")
+  <*> O.switch (O.long "debug" <> O.help "Debug keypaths")
 
 parseCSVMode = O.flag' CSVOutput (O.short 'c' <> O.long "csv" <> O.help "Output CSV")
 
@@ -49,25 +56,31 @@ opts = O.info (O.helper <*> parseOpts)
           (O.fullDesc 
             <> O.progDesc [s| Transform JSON objects to TSV.  
                     On STDIN provide an input stream of whitespace-separated JSON objects. |]
-            <> O.header "jsontsv v0.1.4.1"
+            <> O.header "jsontsv v0.1.4.3"
             <> O.footer "See https://github.com/danchoi/jsontsv for more information.")
 
 main = do
-  Options expr arrayDelim mode showHeaders <- O.execParser opts
+  Options expr arrayDelim mode showHeaders debugKeyPaths <- O.execParser opts
   x <- BL.getContents 
   let xs :: [Value]
       xs = decodeStream x
       ks = parseKeyPath $ T.pack expr
+      -- keypaths without alias info:
+      ks' = [ks' | KeyPath ks' _ <- ks]
       arrayDelim' = T.pack arrayDelim
-  -- Prelude.putStrLn $ "key Paths " ++ show ks
+  when debugKeyPaths $
+     Prelude.putStrLn $ "key Paths " ++ show ks
   when showHeaders $ do
-    let hs = words expr
+    let hs = [case alias of 
+                Just alias' -> T.unpack alias'
+                Nothing -> expr  
+              | (KeyPath _ alias, expr) <- Data.List.zip ks (words expr)] 
     case mode of 
       TSVOutput delim -> Prelude.putStrLn . Data.List.intercalate delim $ hs
       CSVOutput -> Prelude.putStrLn . CSV.printCSV $ [hs]
   case mode of 
-    TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder arrayDelim' delim ks) xs
-    CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList arrayDelim' ks) $  xs
+    TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder arrayDelim' delim ks') xs
+    CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList arrayDelim' ks') $  xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
 decodeStream bs = case decodeWith json bs of
@@ -84,6 +97,12 @@ decodeWith p s =
                       Success a -> (Just a, r)
                       _ -> (Nothing, r)) $ fromJSON v'
 
+
+-- | KeyPath may have an alias for the header output
+data KeyPath = KeyPath [Key] (Maybe Text) deriving Show
+
+data Key = Key Text | Index Int deriving (Eq, Show)
+
 parseKeyPath :: Text -> [KeyPath]
 parseKeyPath s = case AT.parseOnly pKeyPaths s of
     Left err -> error $ "Parse error " ++ err 
@@ -95,34 +114,40 @@ pKeyPaths :: AT.Parser [KeyPath]
 pKeyPaths = pKeyPath `AT.sepBy` spaces
 
 pKeyPath :: AT.Parser KeyPath
-pKeyPath = AT.sepBy1 pKeyOrIndex (AT.takeWhile1 $ AT.inClass ".[")
+pKeyPath = KeyPath 
+    <$> (AT.sepBy1 pKeyOrIndex (AT.takeWhile1 $ AT.inClass ".["))
+    <*> (pAlias <|> pure Nothing)
 
+-- | A column header alias is designated by : followed by alphanum string after keypath
+pAlias :: AT.Parser (Maybe Text)
+pAlias = do
+    AT.char ':'
+    Just <$> AT.takeWhile1 (AT.inClass "a-zA-Z0-9")
+
+pKeyOrIndex :: AT.Parser Key
 pKeyOrIndex = pIndex <|> pKey
 
-pKey = Key <$> AT.takeWhile1 (AT.notInClass " .[")
+pKey = Key <$> AT.takeWhile1 (AT.notInClass " .[:")
 
 pIndex = Index <$> AT.decimal <* AT.char ']'
 
-type KeyPath = [Key]
-data Key = Key Text | Index Int deriving (Eq, Show)
-
-evalToLineBuilder :: Text -> String -> [KeyPath] -> Value -> B.Builder 
+evalToLineBuilder :: Text -> String -> [[Key]] -> Value -> B.Builder 
 evalToLineBuilder arrayDelim delim ks v = 
     mconcat $ intersperse (B.fromText . T.pack $ delim) $  map (flip (evalToBuilder arrayDelim) v) ks
 
 type ArrayDelimiter = Text
 
-evalToList :: Text -> [KeyPath] -> Value -> [Text]
+evalToList :: Text -> [[Key]] -> Value -> [Text]
 evalToList arrayDelim ks v = map (flip (evalToText arrayDelim) v) ks
 
-evalToBuilder :: ArrayDelimiter -> KeyPath -> Value -> B.Builder
+evalToBuilder :: ArrayDelimiter -> [Key] -> Value -> B.Builder
 evalToBuilder d k v = valToBuilder $ evalKeyPath d k v
 
-evalToText :: ArrayDelimiter -> KeyPath -> Value -> Text
+evalToText :: ArrayDelimiter -> [Key] -> Value -> Text
 evalToText d k v = valToText $ evalKeyPath d k v
 
 -- evaluates the a JS key path against a Value context to a leaf Value
-evalKeyPath :: ArrayDelimiter -> KeyPath -> Value -> Value
+evalKeyPath :: ArrayDelimiter -> [Key] -> Value -> Value
 evalKeyPath d [] x@(String _) = x
 evalKeyPath d [] x@Null = x
 evalKeyPath d [] x@(Number _) = x

@@ -97,17 +97,22 @@ Alternatively,
 ## Usage
 
 ```
-jsontsv
+jsontsv v0.1.4.3
 
-Usage: jsontsv FIELDS [-a DELIM] ([-c|--csv] | [-d DELIM]) [-H]
-  Transform JSON objects to TSV
+Usage: jsontsv FIELDS [-a DELIM] ([-c|--csv] | [-d DELIM]) [-H] [--debug]
+  Transform JSON objects to TSV. On STDIN provide an input stream of
+  whitespace-separated JSON objects.
 
 Available options:
   -h,--help                Show this help text
-  -a DELIM                 Concatentated array elem delimiter. Defaults to comma.
+  -a DELIM                 Concatentated array elem delimiter. Defaults to
+                           comma.
   -c,--csv                 Output CSV
   -d DELIM                 Output field delimiter. Defaults to tab.
   -H                       Include headers
+  --debug                  Debug keypaths
+
+See https://github.com/danchoi/jsontsv for more information.
 ```
 
 Input should be a stream of JSON objects of the same or mostly similar shape,
@@ -164,6 +169,16 @@ JSON leaf values are printed as follows:
 * null is printed as `null`
 * If the leaf value is an array, it is concatenated into a single
   comma-separated string. This delimiter can be changed with the `-a` option.
+
+
+## Column header aliases
+
+If the default column headers using `-H` are too long, you can designate
+aliases with the pattern `[keypath]:[alias]`. E.g., 
+
+    curl -s "https://api.github.com/repos/rails/rails/issues" | 
+    jq -M '.[]' | 
+    jsontsv -H 'number title user.login:login state repository.name:repo labels.name:lables' 
 
 ## Known alternatives 
 
