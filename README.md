@@ -178,7 +178,7 @@ aliases with the pattern `[keypath]:[alias]`. E.g.,
 
     curl -s "https://api.github.com/repos/rails/rails/issues" | 
     jq -M '.[]' | 
-    jsontsv -H 'number title user.login:login state repository.name:repo labels.name:lables' 
+    jsontsv -H 'number title user.login:login state repository.name:repo_name' 
 
 ## Known alternatives 
 
