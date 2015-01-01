@@ -56,7 +56,7 @@ opts = O.info (O.helper <*> parseOpts)
           (O.fullDesc 
             <> O.progDesc [s| Transform JSON objects to TSV.  
                     On STDIN provide an input stream of whitespace-separated JSON objects. |]
-            <> O.header "jsontsv v0.1.4.3"
+            <> O.header "jsontsv"
             <> O.footer "See https://github.com/danchoi/jsontsv for more information.")
 
 main = do
@@ -122,7 +122,7 @@ pKeyPath = KeyPath
 pAlias :: AT.Parser (Maybe Text)
 pAlias = do
     AT.char ':'
-    Just <$> AT.takeWhile1 (AT.inClass "a-zA-Z0-9")
+    Just <$> AT.takeWhile1 (AT.inClass "a-zA-Z0-9_-")
 
 pKeyOrIndex :: AT.Parser Key
 pKeyOrIndex = pIndex <|> pKey

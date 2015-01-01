@@ -97,7 +97,7 @@ Alternatively,
 ## Usage
 
 ```
-jsontsv v0.1.4.3
+jsontsv 
 
 Usage: jsontsv FIELDS [-a DELIM] ([-c|--csv] | [-d DELIM]) [-H] [--debug]
   Transform JSON objects to TSV. On STDIN provide an input stream of
