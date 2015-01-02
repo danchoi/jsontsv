@@ -191,6 +191,12 @@ aliases with the pattern `[keypath]:[alias]`. E.g.,
 
 ## Related
 
+* [table](https://github.com/danchoi/table)
+* [jsonsql](https://github.com/danchoi/jsonsql)
+* [tsvsql](https://github.com/danchoi/tsvsql)
+
+## Further reading
+
 * [Seven command line tools for data
   science](http://jeroenjanssens.com/2013/09/19/seven-command-line-tools-for-data-science.html) by Jeroen Janssens.
   A blog post surveying tools like this.
