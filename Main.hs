@@ -153,6 +153,7 @@ evalKeyPath d [] x@Null = x
 evalKeyPath d [] x@(Number _) = x
 evalKeyPath d [] x@(Bool _) = x
 evalKeyPath d [] x@(Object _) = x
+evalKeyPath d [] x@(Array v) | V.null v = Null
 evalKeyPath d [] x@(Array v) = 
           let vs = V.toList v
               xs = intersperse d $ map (evalToText d []) vs
@@ -167,6 +168,7 @@ evalKeyPath d (Index idx:ks) (Array v) =
         Just e' -> evalKeyPath d ks e'
         Nothing -> Null
 -- traverse array elements with additional keys
+evalKeyPath d ks@(Key key:_) (Array v) | V.null v = Null
 evalKeyPath d ks@(Key key:_) (Array v) = 
       let vs = V.toList v
       in String . mconcat . intersperse d $ map (evalToText d ks) vs
