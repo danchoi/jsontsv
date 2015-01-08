@@ -194,6 +194,7 @@ aliases with the pattern `[keypath]:[alias]`. E.g.,
 * [table](https://github.com/danchoi/table)
 * [jsonsql](https://github.com/danchoi/jsonsql)
 * [tsvsql](https://github.com/danchoi/tsvsql)
+* [jsonxlsx](https://github.com/danchoi/jsonxlsx)
 
 ## Further reading
 
