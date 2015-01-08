@@ -75,6 +75,8 @@ main = do
                 Just alias' -> T.unpack alias'
                 Nothing -> expr  
               | (KeyPath _ alias, expr) <- Data.List.zip ks (words expr)] 
+              -- Note `words` introduces a potential bug is quoted aliases are allowed
+              -- See https://github.com/danchoi/jsonxlsx/commit/9aedb4bf97cfa8d5635edc4780bfbf9b79b6f2ec
     case mode of 
       TSVOutput delim -> Prelude.putStrLn . Data.List.intercalate delim $ hs
       CSVOutput -> Prelude.putStrLn . CSV.printCSV $ [hs]
