@@ -57,7 +57,7 @@ parseOpts = Options
             <> O.short 't' <> O.long "true-string"
             <> O.metavar "STRING" <> O.help "String to represent boolean true. Default: 't'"))
   <*> (T.pack 
-        <$> O.strOption (O.value "null" 
+        <$> O.strOption (O.value "f" 
             <> O.short 'f' <> O.long "false-string"
             <> O.metavar "STRING" <> O.help "String to represent boolean false. Default: 'f'"))
   <*> O.switch (O.long "debug" <> O.help "Debug keypaths")
