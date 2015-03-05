@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, QuasiQuotes #-}
+{-# LANGUAGE OverloadedStrings, QuasiQuotes, RecordWildCards #-}
 module Main where
 import Data.Aeson
 import Data.Monoid
@@ -30,9 +30,12 @@ import Data.String.QQ
 
 data Options = Options { 
     jsonExpr :: String
-  , arrayDelim :: String
+  , optArrayDelim :: Text
   , outputMode :: OutputMode
   , showHeader :: Bool
+  , nullString :: Text
+  , optTrueString :: Text
+  , optFalseString :: Text
   , debugKeyPaths :: Bool
   } deriving Show
 
@@ -41,9 +44,22 @@ data OutputMode = TSVOutput { delimiter :: String } | CSVOutput deriving (Show)
 parseOpts :: O.Parser Options
 parseOpts = Options 
   <$> O.argument O.str (O.metavar "FIELDS")
-  <*> O.strOption (O.metavar "DELIM" <> O.value "," <> O.short 'a' <> O.help "Concatentated array elem delimiter. Defaults to comma.")
+  <*> (T.pack 
+        <$> O.strOption (O.metavar "DELIM" <> O.value "," <> O.short 'a' <> O.help "Concatentated array elem delimiter. Defaults to comma."))
   <*> (parseCSVMode <|> parseTSVMode)
   <*> O.flag False True (O.short 'H' <> O.help "Include headers")
+  <*> (T.pack 
+        <$> O.strOption (O.value "null" 
+            <> O.short 'n' <> O.long "null-string"
+            <> O.metavar "STRING" <> O.help "String to represent null value. Default: 'null'"))
+  <*> (T.pack 
+        <$> O.strOption (O.value "t" 
+            <> O.short 't' <> O.long "true-string"
+            <> O.metavar "STRING" <> O.help "String to represent boolean true. Default: 't'"))
+  <*> (T.pack 
+        <$> O.strOption (O.value "null" 
+            <> O.short 'f' <> O.long "false-string"
+            <> O.metavar "STRING" <> O.help "String to represent boolean false. Default: 'f'"))
   <*> O.switch (O.long "debug" <> O.help "Debug keypaths")
 
 parseCSVMode = O.flag' CSVOutput (O.short 'c' <> O.long "csv" <> O.help "Output CSV")
@@ -60,29 +76,33 @@ opts = O.info (O.helper <*> parseOpts)
             <> O.footer "See https://github.com/danchoi/jsontsv for more information.")
 
 main = do
-  Options expr arrayDelim mode showHeaders debugKeyPaths <- O.execParser opts
+  Options{..} <- O.execParser opts
   x <- BL.getContents 
   let xs :: [Value]
       xs = decodeStream x
-      ks = parseKeyPath $ T.pack expr
+      ks = parseKeyPath $ T.pack jsonExpr
       -- keypaths without alias info:
       ks' = [ks' | KeyPath ks' _ <- ks]
-      arrayDelim' = T.pack arrayDelim
   when debugKeyPaths $
      Prelude.putStrLn $ "key Paths " ++ show ks
-  when showHeaders $ do
+  when showHeader $ do
     let hs = [case alias of 
                 Just alias' -> T.unpack alias'
-                Nothing -> expr  
-              | (KeyPath _ alias, expr) <- Data.List.zip ks (words expr)] 
+                Nothing -> jsonExpr  
+              | (KeyPath _ alias, jsonExpr) <- Data.List.zip ks (words jsonExpr)] 
               -- Note `words` introduces a potential bug is quoted aliases are allowed
               -- See https://github.com/danchoi/jsonxlsx/commit/9aedb4bf97cfa8d5635edc4780bfbf9b79b6f2ec
-    case mode of 
+    case outputMode of 
       TSVOutput delim -> Prelude.putStrLn . Data.List.intercalate delim $ hs
       CSVOutput -> Prelude.putStrLn . CSV.printCSV $ [hs]
-  case mode of 
-    TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder arrayDelim' delim ks') xs
-    CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList arrayDelim' ks') $  xs
+  let config = Config {   
+                  arrayDelim = optArrayDelim
+                , nullValueString = nullString
+                , trueString = optTrueString
+                , falseString = optFalseString}
+  case outputMode of 
+    TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder config delim ks') xs
+    CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList config ks') $  xs
 
 decodeStream :: (FromJSON a) => BL.ByteString -> [a]
 decodeStream bs = case decodeWith json bs of
@@ -99,6 +119,13 @@ decodeWith p s =
                       Success a -> (Just a, r)
                       _ -> (Nothing, r)) $ fromJSON v'
 
+
+data Config = Config {
+    arrayDelim :: Text
+  , nullValueString :: Text
+  , trueString :: Text
+  , falseString :: Text
+  } deriving Show
 
 -- | KeyPath may have an alias for the header output
 data KeyPath = KeyPath [Key] (Maybe Text) deriving Show
@@ -133,69 +160,69 @@ pKey = Key <$> AT.takeWhile1 (AT.notInClass " .[:")
 
 pIndex = Index <$> AT.decimal <* AT.char ']'
 
-evalToLineBuilder :: Text -> String -> [[Key]] -> Value -> B.Builder 
-evalToLineBuilder arrayDelim delim ks v = 
-    mconcat $ intersperse (B.fromText . T.pack $ delim) $  map (flip (evalToBuilder arrayDelim) v) ks
+evalToLineBuilder :: Config -> String -> [[Key]] -> Value -> B.Builder 
+evalToLineBuilder config@Config{..} outDelim ks v = 
+    mconcat $ intersperse (B.fromText . T.pack $ outDelim) $  map (flip (evalToBuilder config) v) ks
 
 type ArrayDelimiter = Text
 
-evalToList :: Text -> [[Key]] -> Value -> [Text]
-evalToList arrayDelim ks v = map (flip (evalToText arrayDelim) v) ks
+evalToList :: Config -> [[Key]] -> Value -> [Text]
+evalToList c@Config{..} ks v = map (flip (evalToText c) v) ks
 
-evalToBuilder :: ArrayDelimiter -> [Key] -> Value -> B.Builder
-evalToBuilder d k v = valToBuilder $ evalKeyPath d k v
+evalToBuilder :: Config -> [Key] -> Value -> B.Builder
+evalToBuilder c k v = valToBuilder c $ evalKeyPath c k v
 
-evalToText :: ArrayDelimiter -> [Key] -> Value -> Text
-evalToText d k v = valToText $ evalKeyPath d k v
+evalToText :: Config -> [Key] -> Value -> Text
+evalToText c k v = valToText c $ evalKeyPath c k v
 
 -- evaluates the a JS key path against a Value context to a leaf Value
-evalKeyPath :: ArrayDelimiter -> [Key] -> Value -> Value
-evalKeyPath d [] x@(String _) = x
-evalKeyPath d [] x@Null = x
-evalKeyPath d [] x@(Number _) = x
-evalKeyPath d [] x@(Bool _) = x
-evalKeyPath d [] x@(Object _) = x
-evalKeyPath d [] x@(Array v) | V.null v = Null
-evalKeyPath d [] x@(Array v) = 
+evalKeyPath :: Config -> [Key] -> Value -> Value
+evalKeyPath config [] x@(String _) = x
+evalKeyPath config [] x@Null = x
+evalKeyPath config [] x@(Number _) = x
+evalKeyPath config [] x@(Bool _) = x
+evalKeyPath config [] x@(Object _) = x
+evalKeyPath config [] x@(Array v) | V.null v = Null
+evalKeyPath config [] x@(Array v) = 
           let vs = V.toList v
-              xs = intersperse d $ map (evalToText d []) vs
+              xs = intersperse (arrayDelim config) $ map (evalToText config []) vs
           in String . mconcat $ xs
-evalKeyPath d (Key key:ks) (Object s) = 
+evalKeyPath config (Key key:ks) (Object s) = 
     case (HM.lookup key s) of
-        Just x          -> evalKeyPath d ks x
+        Just x          -> evalKeyPath config ks x
         Nothing -> Null
-evalKeyPath d (Index idx:ks) (Array v) = 
+evalKeyPath config (Index idx:ks) (Array v) = 
       let e = (V.!?) v idx
       in case e of 
-        Just e' -> evalKeyPath d ks e'
+        Just e' -> evalKeyPath config ks e'
         Nothing -> Null
 -- traverse array elements with additional keys
-evalKeyPath d ks@(Key key:_) (Array v) | V.null v = Null
-evalKeyPath d ks@(Key key:_) (Array v) = 
+evalKeyPath _ ks@(Key key:_) (Array v) | V.null v = Null
+evalKeyPath config@Config{..} ks@(Key key:_) (Array v) = 
       let vs = V.toList v
-      in String . mconcat . intersperse d $ map (evalToText d ks) vs
+      in String . mconcat . intersperse arrayDelim $ map (evalToText config ks) vs
 evalKeyPath _ ((Index _):_) _ = Null
 evalKeyPath _ _ _ = Null
 
-valToBuilder :: Value -> B.Builder
-valToBuilder (String x) = B.fromText x
-valToBuilder Null = B.fromText "null"
-valToBuilder (Bool True) = B.fromText "t"
-valToBuilder (Bool False) = B.fromText "f"
-valToBuilder (Number x) = 
+valToBuilder :: Config -> Value -> B.Builder
+valToBuilder _ (String x) = B.fromText x
+valToBuilder Config{..} Null = B.fromText nullValueString
+valToBuilder Config{..} (Bool True) = B.fromText trueString
+valToBuilder Config{..} (Bool False) = B.fromText falseString
+valToBuilder _ (Number x) = 
     case floatingOrInteger x of
         Left float -> B.realFloat float
         Right int -> B.decimal int
-valToBuilder (Object _) = B.fromText "[Object]"
+valToBuilder _ (Object _) = B.fromText "[Object]"
 
-valToText :: Value -> Text
-valToText (String x) = x
-valToText Null = "null"
-valToText (Bool True) = "t"
-valToText (Bool False) = "f"
-valToText (Number x) = 
+valToText :: Config -> Value -> Text
+valToText _ (String x) = x
+valToText Config{..} Null = nullValueString
+valToText Config{..} (Bool True) = trueString
+valToText Config{..} (Bool False) = falseString
+valToText _ (Number x) = 
     case floatingOrInteger x of
         Left float -> T.pack . show $ float
         Right int -> T.pack . show $ int
-valToText (Object _) = "[Object]"
+valToText _ (Object _) = "[Object]"
 

@@ -97,9 +97,11 @@ Alternatively,
 ## Usage
 
 ```
-jsontsv 
+jsontsv
 
-Usage: jsontsv FIELDS [-a DELIM] ([-c|--csv] | [-d DELIM]) [-H] [--debug]
+Usage: jsontsv FIELDS [-a DELIM] ([-c|--csv] | [-d DELIM]) [-H]
+               [-n|--null-string STRING] [-t|--true-string STRING]
+               [-f|--false-string STRING] [--debug]
   Transform JSON objects to TSV. On STDIN provide an input stream of
   whitespace-separated JSON objects.
 
@@ -110,6 +112,9 @@ Available options:
   -c,--csv                 Output CSV
   -d DELIM                 Output field delimiter. Defaults to tab.
   -H                       Include headers
+  -n,--null-string STRING  String to represent null value. Default: 'null'
+  -t,--true-string STRING  String to represent boolean true. Default: 't'
+  -f,--false-string STRING String to represent boolean false. Default: 'f'
   --debug                  Debug keypaths
 
 See https://github.com/danchoi/jsontsv for more information.
@@ -165,8 +170,8 @@ number	title	user.login	state	repository.name	labels.name
 JSON leaf values are printed as follows: 
 
 * Strings and numbers are copied to output.
-* Boolean values are output as `t` or `f`.
-* null is printed as `null`
+* Boolean values are output as `t` or `f`. You can changes this with the -t and -f options.
+* null is printed as `null`. You can change this with the -n option.
 * If the leaf value is an array, it is concatenated into a single
   comma-separated string. This delimiter can be changed with the `-a` option.
 
