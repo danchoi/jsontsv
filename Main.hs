@@ -197,10 +197,17 @@ evalKeyPath config (Index idx:ks) (Array v) =
         Just e' -> evalKeyPath config ks e'
         Nothing -> Null
 -- traverse array elements with additional keys
+-- if key is _, e.g. cast._[0] , traverse INTO each array object
+-- e.g. "cast":[["Michael Caine",13473],["Demi Moore",65231],...
+evalKeyPath config@Config{..} (Key "_":ks) (Array v) = 
+      String . mconcat . intersperse arrayDelim $ map (evalToText config ks) (V.toList v)
+-- traverse array elements with additional keys
+
 evalKeyPath _ ks@(Key key:_) (Array v) | V.null v = Null
 evalKeyPath config@Config{..} ks@(Key key:_) (Array v) = 
       let vs = V.toList v
       in String . mconcat . intersperse arrayDelim $ map (evalToText config ks) vs
+
 evalKeyPath _ ((Index _):_) _ = Null
 evalKeyPath _ _ _ = Null
 

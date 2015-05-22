@@ -78,6 +78,21 @@ Terminator 2: Judgment Day  1991  Arnold Schwarzenegger,Linda Hamilton  8.5
 Interstellar                2014  Matthew McConaughey,Anne Hathaway     8.9
 ```
 
+## Mapping an array index getter over nested arrays
+
+As of version 0.1.5.0, you can map an index getter over arrays, such as this
+
+    {"id":2,"cast":[["Michael Caine",13473],["Demi Moore",65231]]}
+
+with this expression
+
+    jsontsv -a '|' 'cast._[0]'
+
+This results in:
+    
+    2   Michael Caine|Demi Moore
+
+
 ## Installation
 
 Assuming you have a recent version of the [Haskell
