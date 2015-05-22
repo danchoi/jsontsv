@@ -86,7 +86,7 @@ As of version 0.1.5.0, you can map an index getter over arrays, such as this
 
 with this expression
 
-    jsontsv -a '|' 'cast._[0]'
+    jsontsv -a '|' 'cast._[0]' < input
 
 This results in:
     
