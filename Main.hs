@@ -12,7 +12,7 @@ import qualified Data.Text.Lazy.IO as TL
 import Data.Maybe (catMaybes)
 import Control.Applicative
 import Control.Monad (when)
-import Data.ByteString.Lazy as BL hiding (map, intersperse)
+import qualified Data.ByteString.Lazy as BL hiding (map, intersperse)
 import qualified Data.ByteString.Lazy.Char8 as BS
 import Data.Attoparsec.Lazy as Atto hiding (Result)
 import Data.Attoparsec.ByteString.Char8 (endOfLine, sepBy)
