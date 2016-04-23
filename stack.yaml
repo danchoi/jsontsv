@@ -3,4 +3,4 @@ packages:
 - '.'
 extra-deps: 
 - string-qq-0.0.2
-resolver: lts-2.16
+resolver: lts-3.0
