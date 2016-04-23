@@ -166,7 +166,9 @@ pAlias = do
     Just <$> AT.takeWhile1 (AT.inClass "a-zA-Z0-9_-")
 
 pKeyOrIndex :: AT.Parser Key
-pKeyOrIndex = pTupleKey <|> pIndex <|> pKey
+pKeyOrIndex = 
+    ((pTupleKey <|> pIndex) <* AT.char ']')
+    <|> pKey
 
 pIndex :: AT.Parser Key   
 pIndex = Index <$> AT.decimal 
