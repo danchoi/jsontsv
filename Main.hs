@@ -9,7 +9,7 @@ import Data.List (intersperse)
 import qualified Data.List 
 import qualified Data.Text as T
 import qualified Data.Text.Lazy.IO as TL
-import Data.Maybe (catMaybes)
+import Data.Maybe (catMaybes, listToMaybe)
 import Control.Applicative
 import Control.Monad (when)
 import qualified Data.ByteString.Lazy as BL hiding (map, intersperse)
@@ -130,7 +130,19 @@ data Config = Config {
 -- | KeyPath may have an alias for the header output
 data KeyPath = KeyPath [Key] (Maybe Text) deriving Show
 
-data Key = Key Text | Index Int deriving (Eq, Show)
+{-
+  Key represents an object (HashMap) key.
+  Index represents a position in an Array
+  TupleKey represents a Text key in an array of pairs that should be treated 
+    as a map. E.g.
+        [["dinner","fish"],["dessert","pie"]]
+    This is useful in the case of Data.Aeson emits pair tuples:
+        [("dinner", "fish"),("dessert","pie")]
+-}
+data Key = Key Text 
+         | Index Int 
+         | TupleKey Text deriving (Eq, Show)
+
 
 parseKeyPath :: Text -> [KeyPath]
 parseKeyPath s = case AT.parseOnly pKeyPaths s of
@@ -154,11 +166,20 @@ pAlias = do
     Just <$> AT.takeWhile1 (AT.inClass "a-zA-Z0-9_-")
 
 pKeyOrIndex :: AT.Parser Key
-pKeyOrIndex = pIndex <|> pKey
+pKeyOrIndex = pTupleKey <|> pIndex <|> pKey
 
+pIndex :: AT.Parser Key   
+pIndex = Index <$> AT.decimal 
+
+pTupleKey :: AT.Parser Key
+pTupleKey = do 
+    AT.char '"' 
+    xs <- AT.takeWhile1 (AT.notInClass "\"")
+    AT.char '"'
+    return $ TupleKey xs
+
+pKey :: AT.Parser Key
 pKey = Key <$> AT.takeWhile1 (AT.notInClass " .[:")
-
-pIndex = Index <$> AT.decimal <* AT.char ']'
 
 evalToLineBuilder :: Config -> String -> [[Key]] -> Value -> B.Builder 
 evalToLineBuilder config@Config{..} outDelim ks v = 
@@ -196,13 +217,18 @@ evalKeyPath config (Index idx:ks) (Array v) =
       in case e of 
         Just e' -> evalKeyPath config ks e'
         Nothing -> Null
+evalKeyPath config (TupleKey k:ks) (Array v) = 
+      -- array must be an array of 2-tuples
+      let vs :: [(Value, Value)]
+          vs = [(V.head tuple, tuple V.! 1) | Array tuple <- V.toList v , V.length tuple == 2]
+          e = listToMaybe [v' | (String k', v') <- vs, k' == k]
+      in maybe Null (evalKeyPath config ks) e
 -- traverse array elements with additional keys
 -- if key is _, e.g. cast._[0] , traverse INTO each array object
 -- e.g. "cast":[["Michael Caine",13473],["Demi Moore",65231],...
 evalKeyPath config@Config{..} (Key "_":ks) (Array v) = 
       String . mconcat . intersperse arrayDelim $ map (evalToText config ks) (V.toList v)
 -- traverse array elements with additional keys
-
 evalKeyPath _ ks@(Key key:_) (Array v) | V.null v = Null
 evalKeyPath config@Config{..} ks@(Key key:_) (Array v) = 
       let vs = V.toList v

@@ -92,6 +92,30 @@ This results in:
     
     2   Michael Caine|Demi Moore
 
+## Extracting 2-tuple values
+
+From version 0.1.5.0, you can can access lists of pairs, e.g.
+
+    {"menu":[["dinner","fish"],["dessert","pie"]]}
+
+with the expression `["KEY"]`, e.g.:
+
+    jsontsv 'menu["dinner"]'
+    # => fish
+
+    jsontsv 'menu["dessert"]'
+    # => pie
+
+    jsontsv 'menu["drink"]'
+    # => null
+
+This is useful because Data.Aeson emits Haskell 2-tuples in this format:
+
+    ghci> encode [("dinner", "fish"),("dessert","pie")]
+    "[[\"dinner\",\"fish\"],[\"dessert\",\"pie\"]]"
+
+Moreover, encoding 2-tuples is often preferable to encoding `Data.Map.Map` because 
+encoding 2-tuples preserves ordering, whereas encoding `Map` does not.
 
 ## Installation
 
