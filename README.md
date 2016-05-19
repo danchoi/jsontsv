@@ -140,7 +140,7 @@ jsontsv
 
 Usage: jsontsv FIELDS [-a DELIM] ([-c|--csv] | [-d DELIM]) [-H]
                [-n|--null-string STRING] [-t|--true-string STRING]
-               [-f|--false-string STRING] [--debug]
+               [-f|--false-string STRING] [-N|--newline STRING] [--debug]
   Transform JSON objects to TSV. On STDIN provide an input stream of
   whitespace-separated JSON objects.
 
@@ -154,6 +154,8 @@ Available options:
   -n,--null-string STRING  String to represent null value. Default: 'null'
   -t,--true-string STRING  String to represent boolean true. Default: 't'
   -f,--false-string STRING String to represent boolean false. Default: 'f'
+  -N,--newline STRING      String to replace newlines in field text. Default: '
+                           '
   --debug                  Debug keypaths
 
 See https://github.com/danchoi/jsontsv for more information.
@@ -214,6 +216,10 @@ JSON leaf values are printed as follows:
 * If the leaf value is an array, it is concatenated into a single
   comma-separated string. This delimiter can be changed with the `-a` option.
 
+## Newlines in content
+
+If a string field in the JSON contains a `\n` or `\r` character, these will be replaced 
+by spaces by default. The replacement character can be changed with the `-N` option.
 
 ## Column header aliases
 
@@ -223,6 +229,7 @@ aliases with the pattern `[keypath]:[alias]`. E.g.,
     curl -s "https://api.github.com/repos/rails/rails/issues" | 
     jq -M '.[]' | 
     jsontsv -H 'number title user.login:login state repository.name:repo_name' 
+
 
 ## Known alternatives 
 

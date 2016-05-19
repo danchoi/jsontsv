@@ -36,6 +36,7 @@ data Options = Options {
   , nullString :: Text
   , optTrueString :: Text
   , optFalseString :: Text
+  , optNewLineReplacement :: Char
   , debugKeyPaths :: Bool
   } deriving Show
 
@@ -60,6 +61,9 @@ parseOpts = Options
         <$> O.strOption (O.value "f" 
             <> O.short 'f' <> O.long "false-string"
             <> O.metavar "STRING" <> O.help "String to represent boolean false. Default: 'f'"))
+  <*> O.option O.auto (O.value ' ' 
+            <> O.short 'N' <> O.long "newline"
+            <> O.metavar "STRING" <> O.help "String to replace newlines in field text. Default: ' '")
   <*> O.switch (O.long "debug" <> O.help "Debug keypaths")
 
 parseCSVMode = O.flag' CSVOutput (O.short 'c' <> O.long "csv" <> O.help "Output CSV")
@@ -99,7 +103,9 @@ main = do
                   arrayDelim = optArrayDelim
                 , nullValueString = nullString
                 , trueString = optTrueString
-                , falseString = optFalseString}
+                , falseString = optFalseString
+                , newlineReplacement = optNewLineReplacement
+                }
   case outputMode of 
     TSVOutput delim -> mapM_ (TL.putStrLn . B.toLazyText . evalToLineBuilder config delim ks') xs
     CSVOutput -> Prelude.putStrLn . CSV.printCSV $ map (map T.unpack . evalToList config ks') $  xs
@@ -125,6 +131,7 @@ data Config = Config {
   , nullValueString :: Text
   , trueString :: Text
   , falseString :: Text
+  , newlineReplacement :: Char
   } deriving Show
 
 -- | KeyPath may have an alias for the header output
@@ -240,7 +247,7 @@ evalKeyPath _ ((Index _):_) _ = Null
 evalKeyPath _ _ _ = Null
 
 valToBuilder :: Config -> Value -> B.Builder
-valToBuilder _ (String x) = B.fromText x
+valToBuilder Config{..} (String x) = B.fromText . T.map (replaceNewLine newlineReplacement) $ x
 valToBuilder Config{..} Null = B.fromText nullValueString
 valToBuilder Config{..} (Bool True) = B.fromText trueString
 valToBuilder Config{..} (Bool False) = B.fromText falseString
@@ -251,7 +258,7 @@ valToBuilder _ (Number x) =
 valToBuilder _ (Object _) = B.fromText "[Object]"
 
 valToText :: Config -> Value -> Text
-valToText _ (String x) = x
+valToText Config{..} (String x) = T.map (replaceNewLine newlineReplacement) x
 valToText Config{..} Null = nullValueString
 valToText Config{..} (Bool True) = trueString
 valToText Config{..} (Bool False) = falseString
@@ -261,3 +268,7 @@ valToText _ (Number x) =
         Right int -> T.pack . show $ int
 valToText _ (Object _) = "[Object]"
 
+replaceNewLine :: Char -> (Char -> Char)
+replaceNewLine x s | s `elem` ['\n', '\r'] = x
+                   | otherwise             = s
+    
