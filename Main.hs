@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings, QuasiQuotes, RecordWildCards #-}
 module Main where
-import Data.Aeson
+import Data.Aeson hiding (Options)
 import Data.Monoid
 import qualified Data.Map.Strict as M
 import Data.Text (Text)
@@ -27,6 +27,7 @@ import qualified Data.Text.Lazy.Builder.RealFloat as B
 import qualified Options.Applicative as O
 import qualified Text.CSV as CSV
 import Data.String.QQ 
+import Data.Monoid ((<>))
 
 data Options = Options { 
     jsonExpr :: String
